@@ -1620,6 +1620,7 @@ class BLENDERMCP_PT_Panel(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         
+        layout.prop(scene, "blendermcp_host")  # Add host input field
         layout.prop(scene, "blendermcp_port")
         layout.prop(scene, "blendermcp_use_polyhaven", text="Use assets from Poly Haven")
 
@@ -1633,7 +1634,7 @@ class BLENDERMCP_PT_Panel(bpy.types.Panel):
             layout.operator("blendermcp.start_server", text="Start MCP Server")
         else:
             layout.operator("blendermcp.stop_server", text="Stop MCP Server")
-            layout.label(text=f"Running on port {scene.blendermcp_port}")
+            layout.label(text=f"Running on {scene.blendermcp_host}:{scene.blendermcp_port}")
 
 # Operator to set Hyper3D API Key
 class BLENDERMCP_OT_SetFreeTrialHyper3DAPIKey(bpy.types.Operator):
@@ -1685,6 +1686,12 @@ class BLENDERMCP_OT_StopServer(bpy.types.Operator):
 
 # Registration functions
 def register():
+    bpy.types.Scene.blendermcp_host = StringProperty(
+        name="Host",
+        description="Host address for the BlenderMCP server (use 0.0.0.0 to listen on all interfaces)",
+        default="localhost"
+    )
+    
     bpy.types.Scene.blendermcp_port = IntProperty(
         name="Port",
         description="Port for the BlenderMCP server",
@@ -1745,6 +1752,7 @@ def unregister():
     bpy.utils.unregister_class(BLENDERMCP_OT_StartServer)
     bpy.utils.unregister_class(BLENDERMCP_OT_StopServer)
     
+    del bpy.types.Scene.blendermcp_host  # Add this line
     del bpy.types.Scene.blendermcp_port
     del bpy.types.Scene.blendermcp_server_running
     del bpy.types.Scene.blendermcp_use_polyhaven
